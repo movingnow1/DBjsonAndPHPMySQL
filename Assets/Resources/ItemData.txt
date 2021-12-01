@@ -1,0 +1,6 @@
+Car	Car1	소형	1	FALSE
+Car	Car2	중형	1	FALSE
+Car	Car3	대형	1	FALSE
+Particle	Star1	별효과1	1	FALSE
+Particle	Thunder	번개효과	1	FALSE
+Particle	EtcParticle	기타효과	1	FALSE
