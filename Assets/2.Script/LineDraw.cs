@@ -12,7 +12,8 @@ public class LineDraw : MonoBehaviour
     List<Vector2> points = new List<Vector2>();
 
 
-    public GameObject images;
+    //public GameObject images;
+    public RectTransform images;
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -20,8 +21,17 @@ public class LineDraw : MonoBehaviour
             GameObject go = Instantiate(linePrefab);
             lr = go.GetComponent<LineRenderer>();
             col2D = go.GetComponent<EdgeCollider2D>();
-          // points.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-           points.Add(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20f))); //0.3f
+            // points.Add(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            //points.Add(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20f))); //0.3f
+            points.Add(Camera.main.ScreenToViewportPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y))); //0.3f
+
+
+
+            //RectTransformUtility.ScreenPointToLocalPointInRectangle(images, Input.mousePosition, Camera.main, out Vector2 anchoredPos);
+            //go.GetComponent<RectTransform>().anchoredPosition3D = anchoredPos;
+
+
+
             lr.positionCount = 1;
 
              lr.SetPosition(0, points[0]);  //list첫번째 포인트값을 1번째로 지정

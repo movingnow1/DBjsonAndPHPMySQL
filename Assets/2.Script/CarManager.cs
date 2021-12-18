@@ -29,13 +29,19 @@ public class CarManager : MonoBehaviour
     public List<Items> MyItemList; //내가 가지고 있는 아이템 
 
     //자식 설명, 개수
-    public GameObject[] Slot;
+    public GameObject[] Slot,  UsingImage;//이미지활성화 여부버튼
 
-    //탭 클릭 시 이미지
-    public Image[] TabImage;
+    //탭 클릭 시 슬롯 흰 배경 이미지
+    public Image[] TabImage, ItemImage;
 
     //탭 누를때와 안누를때의 sprite
     public Sprite TabIdleSprite, TabSelectSprite;
+
+    public Sprite[] ItemSprite; //실제 아이템 이미지
+
+    public GameObject ExplainPanel;
+    public RectTransform CanvasRect; 
+    public Vector2 v;
 
     void Start()
     {
@@ -56,6 +62,14 @@ public class CarManager : MonoBehaviour
 
         Load(); //MyItemList에 string직렬화값을 list로 남아서 가져옴
                 //내가 가진 아이템
+    }
+
+    private void Update()
+    {
+         //설명창 뜨는 위치 
+        //그래서 ScreenPointToLocalPointInRectangle 새로운 사각형(캔버스) 위치로 변환 >Update로 이동
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(CanvasRect, Input.mousePosition, Camera.main, out Vector2 anchoredPos);
+        ExplainPanel.GetComponent<RectTransform>().anchoredPosition3D = anchoredPos + v;
     }
 
 
@@ -102,16 +116,32 @@ public class CarManager : MonoBehaviour
         //MyItemList[0].Type 대신 사용할 수 있는 법.
 
 
-        //슬롯과 텍스트 보이게 하기
         for (int i = 0; i < Slot.Length; i++)
         {
-            Slot[i].SetActive(i < CurItemList.Count);
+            //슬롯과 텍스트 보이게 하기
+            bool isExist = i < CurItemList.Count; //불값 = 조건식도 가능...
+            Slot[i].SetActive(isExist);
             //탭에 따른 CurItemList type값(예:3) 보다 작을때만 슬롯 text 개수가 0,1,2로 나오게
 
-            Slot[i].GetComponentInChildren<Text>().text = i < CurItemList.Count ? CurItemList[i].Name + "/" + CurItemList[i].isUsing : ""; //작다면 true,이름쓰고 / 크다면 빈공간
+            Slot[i].GetComponentInChildren<Text>().text = isExist ? CurItemList[i].Name /*+ "/" + CurItemList[i].isUsing */ : ""; //작다면 true,이름쓰고 / 크다면 빈공간
+
+
+            if (isExist)
+            {
+                 //제이슨 메모장 이름 순서와 배열 이미지 순서가 같아야 한다.
+
+                 //배열 인덱스로 비교 name 중에 0번째인가 1번째인가 찾아 비교해줌
+                 //빈 슬롯 이미지 배열  =   배열로 담은 아이템이미지 [줄,탭으로 구분한 정보가 모두 담긴 list
+                ItemImage[i].sprite = ItemSprite[AllItemList.FindIndex(x => x.Name == CurItemList[i].Name)];
+               
+                //클릭 할 시 체크 박스 보이게 
+                UsingImage[i].SetActive(CurItemList[i].isUsing);
+            }
+        
+        
         }
 
-
+        //탭 선택 시 이미지 변경
         int tabNum = 0;
         switch (tabName) //탭 마다 지정된 sting값 마다 int tabNum를 지정
         {
@@ -124,6 +154,50 @@ public class CarManager : MonoBehaviour
             TabImage[i].sprite = i == tabNum ? TabSelectSprite : TabIdleSprite;
         }
 
+    }
+
+    
+    IEnumerator PointerCoroutine;
+    //이미지 슬롯 위에 설명 ui 나오게 > slot오브젝트에 Event Trigger 컴포넌트 추가함
+    public void PointerEnter(int sloutNum)
+    {
+        PointerCoroutine = PointerEnterDelay(sloutNum);
+        StartCoroutine(PointerCoroutine);
+
+        ExplainPanel.GetComponentInChildren<Text>().text = CurItemList[sloutNum].Name; //CurItemList배열 아닌 매개변수 슬롯int값을 받아서 
+                                                                                       // 위의 CurItemList[index]번호와 비교가 되는가봄
+
+      
+       ExplainPanel.transform.GetChild(2).GetComponentInChildren<Image>().sprite = Slot[sloutNum].transform.GetChild(1).GetComponent<Image>().sprite;
+        ExplainPanel.transform.GetChild(3).GetComponent<Text>().text = CurItemList[sloutNum].Number + "개";
+        ExplainPanel.transform.GetChild(4).GetComponent<Text>().text = CurItemList[sloutNum].Explain;
+
+
+        //패널 창 위치 > Update함수로 이동됨
+        //마우스 위치로 설명 창이 위치되도록  //input.mousePosition은 0,0부터 1920,1080까지 감
+        // ExplainPanel.GetComponent<RectTransform>().anchoredPosition3D = Input.mousePosition;
+
+        //그래서 ScreenPointToLocalPointInRectangle 새로운 사각형(캔버스) 위치로 변환 >Update로 이동
+
+    }
+    //마우스가 0.5 후에 바로 다른 곳으로 이동하면,
+    //나타나고나서는 안사라지게 된다.
+    //0.5초 전에는 false로 하고(Eixt함수), 그 이후 true되는데
+    //이미 fasle Eixt함수가 작동되므로, ture가 되면 다시 꺼질 수 없게 됨
+    IEnumerator PointerEnterDelay(int sloutNum)
+    {
+        yield return new WaitForSeconds(0.5f);
+        ExplainPanel.SetActive(true);
+    }
+
+
+    public void PointerExit(int sloutNum)
+    {
+        StopCoroutine(PointerCoroutine); //그래서 0.5초 후 발동시키려면, 
+                                                    // Exit함수가 아닌 저장해둔 Dalay를 멈추고
+                                                    // StopCoroutine만 쓰면 Delay함수를 찾지 못하므로, 
+                                                    // IEnumerator PointerCoroutine;를 위에 하나 만들어 놓고, Dalay함수를 저장해둠
+        ExplainPanel.SetActive(false);
     }
 
 
