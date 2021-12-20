@@ -4,5 +4,17 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/1.Scenes/INT.unity
+    guid: a0160e7aca9dfa448a569e0f093ad4ad
+  - enabled: 1
+    path: Assets/1.Scenes/Car.unity
+    guid: 776bd1f256a88fd49a100db4274f718d
+  - enabled: 1
+    path: Assets/1.Scenes/Company_ConTest_Final.unity
+    guid: e939fc2364b2ade408dd5b7eaef88674
+  - enabled: 1
+    path: Assets/1.Scenes/Spine 2D ani.unity
+    guid: 6dd68ac2776525a4589f3ce28db1913e
   m_configObjects: {}
