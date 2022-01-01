@@ -28,6 +28,19 @@ public class IntputCount : MonoBehaviour
     public List<int> scedularsInt = new List<int>();//연결리스트. 버튼 클릭 순서 기억
 
 
+
+
+    public static IntputCount instance = null;
+
+
+    public void Awake()
+    {
+        instance = this;
+
+    }
+
+
+
     //input text값을 받아 int로 변환
     public void OnCountclick()
     {
@@ -128,17 +141,27 @@ public class IntputCount : MonoBehaviour
         #endregion
 
 
-//---------사용자 입력숫자 만큼만 나와 index리스트에 넣으므로, 부족하여 에러 발생됨. 고쳐야 함
-      
-        numberFristScene = scedularsInt.ElementAt(0); //0번째인덱스의 값을 찾기,첫번째 씬전환 목적저 
+        numberFristScene = scedularsInt.ElementAt(0); //0번째인덱스의 값을 찾기,첫번째 씬전환 목적
         Debug.Log(numberFristScene);
 
         #region 두,세번째 씬전환 위해 미리 인덱스 번호 찾음
 
-        numberSecondScene = scedularsInt.ElementAt(1); //1번째인덱스의 값을 찾기,두번째 씬전환 목적
-        numberThirdScene = scedularsInt.ElementAt(2); //1번째인덱스의 값을 찾기,두번째 씬전환 목적
-        Debug.Log(numberSecondScene);
-        Debug.Log(numberThirdScene);
+        if (scedularsInt.Count == 2) //List의 개수가 총 3개(0,1,2)까지라면 그때만 2번째 인덱스 값 찾기
+        {
+            numberSecondScene = scedularsInt.ElementAt(1); //1번째인덱스의 값을 찾기,두번째 씬전환 목적
+            Debug.Log(numberSecondScene);
+        }
+          
+
+        if (scedularsInt.Count == 3) //List의 개수가 총 3개(0,1,2)까지라면 그때만 2번째 인덱스 값 찾기
+        {
+            numberSecondScene = scedularsInt.ElementAt(1); //1번째인덱스의 값을 찾기,두번째 씬전환 목적
+            numberThirdScene = scedularsInt.ElementAt(2); //2번째인덱스의 값을 찾기,세번째 씬전환 목적
+            Debug.Log(numberSecondScene);
+            Debug.Log(numberThirdScene);
+        }
+        
+
 
         #endregion
 
@@ -154,6 +177,24 @@ public class IntputCount : MonoBehaviour
         }
 
         else { SceneManager.LoadScene(3); }
+        #endregion
+
+
+    }
+
+    public void OnClickScecondsBtn()
+    {
+        #region 두번째 씬으로 전환하기. 그 전 2번째로 선택한 버튼
+        if (numberSecondScene == numberBtn1) //0번째인덱스의 값이 0이라면 
+        {
+            SceneManager.LoadScene(1);
+        }
+        if (numberSecondScene == numberBtn2) //0번째인덱스가 값1이라면
+        {
+            SceneManager.LoadScene(2);
+        }
+
+       if(numberSecondScene == numberBtn3) { SceneManager.LoadScene(3); }
         #endregion
     }
 }
